@@ -1,0 +1,42 @@
+@use '@streamia/shared/styles/index.scss';
+
+.breadcrumb-nav {
+  padding: 1rem 2rem;
+  background: #1a1a1a;
+
+  .breadcrumb-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+
+      a {
+        color: #b3b3b3;
+        text-decoration: none;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #e50914;
+        }
+      }
+
+      .breadcrumb-current {
+        color: #ffffff;
+      }
+
+      .breadcrumb-separator {
+        margin: 0 0.75rem;
+        color: #666;
+      }
+    }
+  }
+}

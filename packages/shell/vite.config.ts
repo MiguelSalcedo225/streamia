@@ -10,9 +10,10 @@ export default defineConfig({
       name: 'shell',
       remotes: {
         authMFE: process.env.VITE_AUTH_MFE_URL || 'http://localhost:3001/assets/remoteEntry.js',
+        staticMFE: process.env.VITE_STATIC_MFE_URL || 'http://localhost:3006/assets/remoteEntry.js',
         // Add more microfrontends here as they are created
-        // catalogMFE: process.env.VITE_CATALOG_MFE_URL || 'http://localhost:3002/assets/remoteEntry.js',
-        // playerMFE: process.env.VITE_PLAYER_MFE_URL || 'http://localhost:3003/assets/remoteEntry.js',
+        // catalogMFE: process.env.VITE_CATALOG_MFE_URL || 'http://localhost:3003/assets/remoteEntry.js',
+        // playerMFE: process.env.VITE_PLAYER_MFE_URL || 'http://localhost:3004/assets/remoteEntry.js',
       },
       shared: {
         react: '^19.2.0',

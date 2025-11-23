@@ -1,0 +1,140 @@
+@use '@streamia/shared/styles/index.scss';
+
+.manual-page {
+  .manual-hero {
+    background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%);
+    padding: 5rem 2rem 3rem;
+    text-align: center;
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+
+    .lead {
+      font-size: 1.3rem;
+      color: #b3b3b3;
+    }
+  }
+
+  .manual-content {
+    padding: 4rem 2rem;
+    background: #0f0f0f;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      .manual-grid {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 3rem;
+
+        @media (max-width: 968px) {
+          grid-template-columns: 1fr;
+        }
+
+        .manual-sidebar {
+          position: sticky;
+          top: 2rem;
+          height: fit-content;
+          background: #1a1a1a;
+          padding: 1.5rem;
+          border-radius: 8px;
+
+          @media (max-width: 968px) {
+            position: static;
+          }
+
+          h3 {
+            font-size: 1.3rem;
+            color: #e50914;
+            margin-bottom: 1rem;
+          }
+
+          .manual-nav {
+            ul {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+
+              li {
+                margin-bottom: 0.5rem;
+
+                a {
+                  color: #b3b3b3;
+                  text-decoration: none;
+                  display: block;
+                  padding: 0.5rem;
+                  border-radius: 4px;
+                  transition: all 0.2s;
+
+                  &:hover {
+                    color: #ffffff;
+                    background: rgba(229, 9, 20, 0.1);
+                  }
+                }
+
+                ul {
+                  margin-left: 1rem;
+                  margin-top: 0.5rem;
+
+                  a {
+                    font-size: 0.9rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .manual-main {
+          .manual-section {
+            margin-bottom: 3rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid #333;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            h2 {
+              font-size: 2rem;
+              color: #e50914;
+              margin-bottom: 1rem;
+              scroll-margin-top: 2rem;
+            }
+
+            > p {
+              font-size: 1.1rem;
+              color: #b3b3b3;
+              line-height: 1.8;
+              margin-bottom: 1.5rem;
+            }
+
+            .manual-subsections {
+              .manual-subsection {
+                margin-top: 2rem;
+                padding-left: 1.5rem;
+                border-left: 3px solid #e50914;
+
+                h3 {
+                  font-size: 1.5rem;
+                  color: #ffffff;
+                  margin-bottom: 0.75rem;
+                  scroll-margin-top: 2rem;
+                }
+
+                p {
+                  color: #b3b3b3;
+                  line-height: 1.6;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

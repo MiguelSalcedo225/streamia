@@ -5,10 +5,15 @@ export const MFE_CONFIG = {
     url: import.meta.env.DEV ? 'http://localhost:3001' : '/auth',
     routes: ['/login', '/register', '/recover-password', '/reset-password'],
   },
+  static: {
+    name: 'staticMFE',
+    url: import.meta.env.DEV ? 'http://localhost:3006' : '/static',
+    routes: ['/', '/about', '/contact', '/manual', '/sitemap'],
+  },
   // Add more microfrontends here as they are created
   // catalog: {
   //   name: 'catalogMFE',
-  //   url: import.meta.env.DEV ? 'http://localhost:3002' : '/catalog',
+  //   url: import.meta.env.DEV ? 'http://localhost:3003' : '/catalog',
   //   routes: ['/movies', '/movie/:id'],
   // },
 };

@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSharedStore } from '../store/SharedStore';
 import { Menu, User, LogOut, Film } from 'lucide-react';
-import { getMFEUrl } from '../config/microfrontends';
 import './NavBar.scss';
 
 export const NavBar: React.FC = () => {
@@ -12,21 +11,12 @@ export const NavBar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    // Redirect to auth MFE for login
-    const loginUrl = getMFEUrl('/login');
-    if (loginUrl) {
-      window.location.href = loginUrl;
-    } else {
-      navigate('/login');
-    }
+    navigate('/login');
   };
 
   const handleAuthNavigation = (path: string) => {
     setIsMenuOpen(false);
-    const mfeUrl = getMFEUrl(path);
-    if (mfeUrl) {
-      window.location.href = mfeUrl;
-    }
+    navigate(path);
   };
 
   return (

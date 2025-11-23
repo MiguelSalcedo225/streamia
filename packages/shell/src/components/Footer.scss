@@ -5,7 +5,6 @@
   background: linear-gradient(180deg, $background-dark 0%, $background-gray 100%);
   color: $text-primary;
   padding: $spacing-xxl 0 $spacing-lg;
-  margin-top: $spacing-xxl * 2;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 
   &-container {
@@ -66,7 +65,6 @@
   }
 
   &-copy {
-    margin-top: $spacing-xl;
     padding-top: $spacing-xl;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     text-align: center;

@@ -9,13 +9,8 @@
 
   &-main {
     flex: 1;
-    max-width: $desktop;
     width: 100%;
-    margin: 0 auto;
-    padding: $spacing-xl;
-
-    @include mobile {
-      padding: $spacing-md;
-    }
+    padding: 0;
+    margin: 0;
   }
 }

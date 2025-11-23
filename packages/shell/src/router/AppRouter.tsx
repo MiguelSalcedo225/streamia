@@ -29,12 +29,10 @@ const AuthMFE = loadMicrofrontend(
   'Auth MFE'
 );
 
-// Placeholder for home page (can be a static page or another MFE)
-const HomePage: React.FC = () => (
-  <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-    <h1>Bienvenido a STREAMIA</h1>
-    <p>Tu plataforma de streaming de películas</p>
-  </div>
+// Load Static MFE
+const StaticMFE = loadMicrofrontend(
+  () => import('staticMFE/App'),
+  'Static MFE'
 );
 
 export const AppRouter: React.FC = () => {
@@ -44,13 +42,10 @@ export const AppRouter: React.FC = () => {
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<HomePage />} />
-              
               {/* Auth Routes - Auth MFE */}
-              <Route path="/login/*" element={<AuthMFE />} />
-              <Route path="/register/*" element={<AuthMFE />} />
-              <Route path="/recover-password/*" element={<AuthMFE />} />
+              <Route path="/login" element={<AuthMFE />} />
+              <Route path="/register" element={<AuthMFE />} />
+              <Route path="/recover-password" element={<AuthMFE />} />
               <Route path="/reset-password/*" element={<AuthMFE />} />
 
               {/* Protected Routes - Placeholder for other MFEs */}
@@ -87,11 +82,8 @@ export const AppRouter: React.FC = () => {
                 }
               />
 
-              {/* Static Pages */}
-              <Route path="/about" element={<div>About Page (To be implemented)</div>} />
-              <Route path="/contact" element={<div>Contact Page (To be implemented)</div>} />
-              <Route path="/manual" element={<div>Manual Page (To be implemented)</div>} />
-              <Route path="/sitemap" element={<div>Sitemap Page (To be implemented)</div>} />
+              {/* Static Pages - Static MFE */}
+              <Route path="/*" element={<StaticMFE />} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />

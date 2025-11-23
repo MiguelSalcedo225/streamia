@@ -1,0 +1,99 @@
+@use '@streamia/shared/styles/index.scss';
+
+.contact-page {
+  .contact-hero {
+    background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%);
+    padding: 5rem 2rem 3rem;
+    text-align: center;
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #ffffff;
+    }
+
+    .lead {
+      font-size: 1.3rem;
+      color: #b3b3b3;
+    }
+  }
+
+  .contact-content {
+    padding: 4rem 2rem;
+    background: #0f0f0f;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
+
+        .contact-info {
+          h2 {
+            font-size: 2rem;
+            color: #e50914;
+            margin-bottom: 2rem;
+          }
+
+          .info-item {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+
+            h3 {
+              font-size: 1.3rem;
+              color: #ffffff;
+              margin-bottom: 0.5rem;
+            }
+
+            p {
+              color: #b3b3b3;
+              line-height: 1.6;
+              margin: 0.5rem 0;
+
+              a {
+                color: #e50914;
+                text-decoration: none;
+
+                &:hover {
+                  text-decoration: underline;
+                }
+              }
+            }
+
+            .info-note {
+              font-size: 0.9rem;
+              color: #888;
+            }
+          }
+        }
+
+        .contact-form-wrapper {
+          background: #1a1a1a;
+          padding: 2rem;
+          border-radius: 8px;
+
+          .contact-form {
+            h3 {
+              font-size: 1.5rem;
+              color: #ffffff;
+              margin-bottom: 1rem;
+            }
+
+            p {
+              color: #b3b3b3;
+            }
+          }
+        }
+      }
+    }
+  }
+}
