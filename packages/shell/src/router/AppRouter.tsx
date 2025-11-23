@@ -29,6 +29,11 @@ const AuthMFE = loadMicrofrontend(
   'Auth MFE'
 );
 
+const CatalogMFE = loadMicrofrontend(
+  () => import('catalogMFE/App'),
+  'Catalog MFE'
+);
+
 // Load Static MFE
 const StaticMFE = loadMicrofrontend(
   () => import('staticMFE/App'),
@@ -47,6 +52,9 @@ export const AppRouter: React.FC = () => {
               <Route path="/register" element={<AuthMFE />} />
               <Route path="/recover-password" element={<AuthMFE />} />
               <Route path="/reset-password/*" element={<AuthMFE />} />
+
+              <Route path="/home-movies" element={<CatalogMFE />} />
+              <Route path="/movies" element={<CatalogMFE />} />
 
               {/* Protected Routes - Placeholder for other MFEs */}
               <Route

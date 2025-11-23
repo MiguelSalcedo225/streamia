@@ -32,6 +32,11 @@ if [ $? -ne 0 ]; then
 fi
 cd ../..
 
+echo "Building Catalog MFE..."
+cd packages/catalog-mfe
+npm run build
+cd ../..
+
 # Build Static MFE
 echo -e "\n${BLUE}Building Static MFE...${NC}"
 cd packages/static-mfe
@@ -49,6 +54,10 @@ echo -e "\n${BLUE}Iniciando servidores...${NC}\n"
 cd packages/auth-mfe
 npm run preview > ../../logs/auth-mfe.log 2>&1 &
 AUTH_PID=$!
+cd ../..
+
+cd packages/catalog-mfe
+npm run preview > ../../logs/catalog-mfe.log 2>&1 &
 cd ../..
 
 # Iniciar Static MFE en preview mode
