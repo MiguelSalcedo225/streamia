@@ -18,6 +18,7 @@ export const HomeMoviesPage: React.FC = () => {
   const [newReleases, setNewReleases] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [favoritesIds, setFavoritesIds] = useState<Set<string>>(new Set());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const featuredMovies = [
     {
@@ -57,6 +58,13 @@ export const HomeMoviesPage: React.FC = () => {
   useEffect(() => {
     loadMovies();
     loadFavorites();
+    setupEventListeners();
+
+    return () => {
+      // Cleanup event listeners
+      window.removeEventListener('user:authenticated', handleUserAuthenticated);
+      window.removeEventListener('favorite:removed', handleFavoriteRemoved);
+    };
   }, []);
 
   useEffect(() => {
@@ -66,6 +74,37 @@ export const HomeMoviesPage: React.FC = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const setupEventListeners = () => {
+    // Escuchar cuando el usuario se autentica
+    window.addEventListener('user:authenticated', handleUserAuthenticated as EventListener);
+    
+    // Escuchar cuando se elimina un favorito desde otro MFE
+    window.addEventListener('favorite:removed', handleFavoriteRemoved as EventListener);
+
+    logger.info('Event listeners configured');
+  };
+
+  const handleUserAuthenticated = (event: CustomEvent) => {
+    const { userId, user } = event.detail;
+    logger.info('User authenticated event received', { userId });
+    setIsAuthenticated(true);
+    
+    // Recargar favoritos del usuario autenticado
+    loadFavorites();
+  };
+
+  const handleFavoriteRemoved = (event: CustomEvent) => {
+    const { movieId } = event.detail;
+    logger.info('Favorite removed event received', { movieId });
+    
+    // Actualizar UI local
+    setFavoritesIds(prev => {
+      const next = new Set(prev);
+      next.delete(movieId);
+      return next;
+    });
+  };
 
   const loadMovies = async () => {
     try {

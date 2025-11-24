@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import type { FavoritePayload } from '../types/movie.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';

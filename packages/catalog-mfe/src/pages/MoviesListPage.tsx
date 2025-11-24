@@ -44,6 +44,14 @@ export const MoviesListPage: React.FC = () => {
     if (initialSearch) {
       setSearchQuery(initialSearch);
     }
+    
+    setupEventListeners();
+
+    return () => {
+      // Cleanup event listeners
+      window.removeEventListener('user:authenticated', handleUserAuthenticated);
+      window.removeEventListener('favorite:removed', handleFavoriteRemoved);
+    };
   }, []);
 
   useEffect(() => {
@@ -60,6 +68,31 @@ export const MoviesListPage: React.FC = () => {
       logger.info('Filters updated', { filters });
     }
   }, [filters]);
+
+  const setupEventListeners = () => {
+    // Escuchar cuando el usuario se autentica
+    window.addEventListener('user:authenticated', handleUserAuthenticated as EventListener);
+    
+    // Escuchar cuando se elimina un favorito desde otro MFE
+    window.addEventListener('favorite:removed', handleFavoriteRemoved as EventListener);
+
+    logger.info('Event listeners configured');
+  };
+
+  const handleUserAuthenticated = (event: CustomEvent) => {
+    const { userId, user } = event.detail;
+    logger.info('User authenticated event received', { userId });
+    
+    // Recargar la lista de películas con favoritos actualizados
+    window.location.reload(); // O implementar una forma más elegante de recargar
+  };
+
+  const handleFavoriteRemoved = (event: CustomEvent) => {
+    const { movieId } = event.detail;
+    logger.info('Favorite removed event received from external source', { movieId });
+    
+    // El hook useMovies ya maneja esto, pero podemos agregar lógica adicional aquí
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -78,11 +111,14 @@ export const MoviesListPage: React.FC = () => {
 
   const handleMovieClick = (movie: any) => {
     logger.info('Movie clicked', { movieId: movie.id, title: movie.title });
+    
+    // Emitir evento movie:selected
     window.dispatchEvent(
       new CustomEvent('movie:selected', {
         detail: { movieId: movie.id, movie },
       })
     );
+    
     navigate(`/movie/${movie.id}`);
   };
 
