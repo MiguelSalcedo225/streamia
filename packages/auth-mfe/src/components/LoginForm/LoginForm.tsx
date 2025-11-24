@@ -60,8 +60,8 @@ export const LoginForm: React.FC = () => {
         // Store token
         TokenManager.setToken(token);
         
-        // Emit login event
-        EventBus.publish(EVENTS.USER_LOGIN, user);
+        // Emit login event with both user and token
+        EventBus.publish(EVENTS.USER_LOGIN, { user, token });
         
         logger.info('Login successful', { userId: user._id });
         
