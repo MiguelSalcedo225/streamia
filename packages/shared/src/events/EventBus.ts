@@ -37,7 +37,7 @@ export class EventBus {
    * @param event Event name
    * @param data Event data
    */
-  publish(event: string, data?: any): void {
+   publish(event: string, data?: any): void {
     const callbacks = this.events.get(event);
     if (callbacks) {
       callbacks.forEach(callback => {

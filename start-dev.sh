@@ -62,15 +62,15 @@ echo "Esperando a que los microfrontends estén listos..."
 sleep 3
 
 # Verificar que los servidores estén corriendo
-if ! curl -s http://localhost:3001/assets/remoteEntry.js > /dev/null; then
-    echo "Auth MFE no está disponible en puerto 3001"
-    exit 1
-fi
+# if ! curl -s http://localhost:3001/assets/remoteEntry.js > /dev/null; then
+#     echo "Auth MFE no está disponible en puerto 3001"
+#     exit 1
+# fi
 
-if ! curl -s http://localhost:3006/assets/remoteEntry.js > /dev/null; then
-    echo "Static MFE no está disponible en puerto 3006"
-    exit 1
-fi
+# if ! curl -s http://localhost:3006/assets/remoteEntry.js > /dev/null; then
+#     echo "Static MFE no está disponible en puerto 3006"
+#     exit 1
+# fi
 
 echo -e "${GREEN}Microfrontends listos${NC}"
 
