@@ -35,6 +35,11 @@ const StaticMFE = loadMicrofrontend(
   'Static MFE'
 );
 
+const FavoritesMFE = loadMicrofrontend(
+  () => import('favoritesMFE/App'),
+  'Favorites MFE'
+);
+
 export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
@@ -47,6 +52,7 @@ export const AppRouter: React.FC = () => {
               <Route path="/register" element={<AuthMFE />} />
               <Route path="/recover-password" element={<AuthMFE />} />
               <Route path="/reset-password/*" element={<AuthMFE />} />
+              
 
               {/* Protected Routes - Placeholder for other MFEs */}
               <Route
@@ -73,14 +79,8 @@ export const AppRouter: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/favorites"
-                element={
-                  <ProtectedRoute>
-                    <div>Favorites MFE (To be implemented)</div>
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/favorites/*" element={<FavoritesMFE />} />
+          
 
               {/* Static Pages - Static MFE */}
               <Route path="/*" element={<StaticMFE />} />

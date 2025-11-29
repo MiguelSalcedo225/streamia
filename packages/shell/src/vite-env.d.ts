@@ -35,6 +35,11 @@ declare module 'staticMFE/SitemapPage' {
   export { SitemapPage };
 }
 
+declare module 'favoritesMFE/App' {
+  const App: React.ComponentType;
+  export default App;
+}
+
 interface ImportMetaEnv {
   readonly DEV: boolean;
   readonly VITE_AUTH_MFE_URL?: string;

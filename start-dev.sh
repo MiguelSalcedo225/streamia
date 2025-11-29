@@ -20,6 +20,7 @@ NC='\033[0m' # No Color
 declare -a MFE_CONFIGS=(
     "Auth MFE:auth-mfe:3001"
     "Static MFE:static-mfe:3006"
+    "Favorites MFE:favorites-mfe:3005"
     # Ejemplo para añadir más:
     # "Movies MFE:movies-mfe:3002"
     # "Profile MFE:profile-mfe:3003"
@@ -99,10 +100,11 @@ start_mfe_preview() {
     local port=$3
     
     cd packages/$folder
-    npm run preview > ../../logs/$folder.log 2>&1 &
+    npm run preview -- --port $port > ../../logs/$folder.log 2>&1 &
     local pid=$!
     cd ../..
     echo "  $name iniciado en puerto $port (PID: $pid)"
+ 
 }
 
 # Función para verificar que un MFE esté disponible
