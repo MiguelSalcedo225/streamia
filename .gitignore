@@ -106,3 +106,5 @@ remoteEntry.js.map
 
 # Debug
 debug.log
+
+delete-dev.ps1
