@@ -11,16 +11,22 @@ interface FilterPanelProps {
 }
 
 const GENRES = [
-  { id: 'action', label: 'Acción', icon: '💥' },
-  { id: 'comedy', label: 'Comedia', icon: '😄' },
-  { id: 'drama', label: 'Drama', icon: '🎭' },
-  { id: 'horror', label: 'Terror', icon: '👻' },
-  { id: 'sci-fi', label: 'Ciencia Ficción', icon: '🚀' },
-  { id: 'romance', label: 'Romance', icon: '💕' },
-  { id: 'thriller', label: 'Thriller', icon: '🔪' },
-  { id: 'animation', label: 'Animación', icon: '🎨' },
-  { id: 'documentary', label: 'Documental', icon: '📽️' },
-  { id: 'adventure', label: 'Aventura', icon: '🗺️' },
+  { id: 'Acción', label: 'Acción', icon: '💥' },
+  { id: 'Thriller', label: 'Thriller', icon: '🔪' },
+  { id: 'Crimen', label: 'Crimen', icon: '🔫' },
+  { id: 'Misterio', label: 'Misterio', icon: '🕵️' },
+  { id: 'Terror', label: 'Terror', icon: '👻' },
+  { id: 'Musical', label: 'Musical', icon: '🎵' },
+  { id: 'Fantasía', label: 'Fantasía', icon: '✨' },
+  { id: 'Romance', label: 'Romance', icon: '💕' },
+  { id: 'Animación', label: 'Animación', icon: '🎨' },
+  { id: 'Aventura', label: 'Aventura', icon: '🗺️' },
+  { id: 'Ciencia Ficción', label: 'Ciencia Ficción', icon: '🚀' },
+  { id: 'Comedia', label: 'Comedia', icon: '😄' },
+  { id: 'Drama', label: 'Drama', icon: '🎭' },
+  { id: 'Historia', label: 'Historia', icon: '📜' },
+  { id: 'Bélica', label: 'Bélica', icon: '⚔️' },
+  { id: 'Familia', label: 'Familia', icon: '👨‍👩‍👧‍👦' },
 ];
 
 const RATINGS = [
@@ -81,12 +87,12 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 {GENRES.find(g => g.id === selectedGenre)?.icon}
               </span>
               <span className="filter-pill__label">
-                {GENRES.find(g => g.id === selectedGenre)?.label}
+                {selectedGenre}
               </span>
               <button
                 className="filter-pill__remove"
                 onClick={() => onGenreChange(undefined)}
-                aria-label="Eliminar filtro de género"
+                aria-label={`Eliminar filtro ${selectedGenre}`}
               >
                 <X size={14} />
               </button>

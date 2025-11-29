@@ -39,7 +39,6 @@ class MovieService {
    * Obtener películas con filtros (intenta backend, fallback a mock)
    */
   async getMovies(filters?: MovieFilters): Promise<MovieResponse> {
-    // Si está configurado para usar mock, usar directamente
     if (USE_MOCK_DATA) {
       const filtered = this.applyFilters(mockMovies, filters);
       return {
@@ -84,7 +83,6 @@ class MovieService {
    * Obtener película por ID (intenta backend, fallback a mock)
    */
   async getMovieById(id: string): Promise<Movie> {
-    // Si está configurado para usar mock, usar directamente
     if (USE_MOCK_DATA) {
       const movie = mockMovies.find(m => m.id === id);
       if (!movie) {

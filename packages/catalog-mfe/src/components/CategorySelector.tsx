@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, TrendingUp, Clock, Film } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, TrendingUp, Clock, Film, Zap, Laugh, Heart, Ghost, Rocket } from 'lucide-react';
 import '../styles/CategorySelector.scss';
 
 interface CategorySelectorProps {
@@ -7,6 +7,7 @@ interface CategorySelectorProps {
   onCategoryChange: (category: string | undefined) => void;
 }
 
+// ✅ CORRECCIÓN: Usar las categorías reales de mockMovies
 const CATEGORIES = [
   { 
     id: undefined, 
@@ -23,18 +24,53 @@ const CATEGORIES = [
     description: 'Lo más popular'
   },
   { 
-    id: 'new', 
-    label: 'Novedades', 
+    id: 'new-releases',  // ✅ CORREGIDO: 'new' → 'new-releases'
+    label: 'Nuevos Lanzamientos', 
     icon: Sparkles,
     gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
     description: 'Recién agregadas'
   },
   { 
-    id: 'recent', 
-    label: 'Vistas recientemente', 
+    id: 'action',  // ✅ NUEVO: Agregar categorías reales
+    label: 'Acción', 
+    icon: Zap,
+    gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%)',
+    description: 'Películas de acción'
+  },
+  { 
+    id: 'comedy', 
+    label: 'Comedia', 
+    icon: Laugh,
+    gradient: 'linear-gradient(135deg, #a8e6cf 0%, #3edbf0 100%)',
+    description: 'Risas garantizadas'
+  },
+  { 
+    id: 'drama', 
+    label: 'Drama', 
+    icon: Heart,
+    gradient: 'linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%)',
+    description: 'Historias emocionantes'
+  },
+  { 
+    id: 'horror', 
+    label: 'Terror', 
+    icon: Ghost,
+    gradient: 'linear-gradient(135deg, #434343 0%, #000000 100%)',
+    description: 'Para los valientes'
+  },
+  { 
+    id: 'sci-fi', 
+    label: 'Ciencia Ficción', 
+    icon: Rocket,
+    gradient: 'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)',
+    description: 'Futuro y fantasía'
+  },
+  { 
+    id: 'classics', 
+    label: 'Clásicos', 
     icon: Clock,
-    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    description: 'Tu historial'
+    gradient: 'linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)',
+    description: 'Películas icónicas'
   },
 ];
 
@@ -92,7 +128,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       </div>
 
       <div className="category-selector__wrapper">
-        {/* Left Arrow */}
         {showLeftArrow && (
           <button
             className="category-selector__arrow category-selector__arrow--left"
@@ -103,7 +138,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           </button>
         )}
 
-        {/* Categories Container */}
         <div 
           className="category-selector__container" 
           ref={scrollContainerRef}
@@ -144,7 +178,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           })}
         </div>
 
-        {/* Right Arrow */}
         {showRightArrow && (
           <button
             className="category-selector__arrow category-selector__arrow--right"

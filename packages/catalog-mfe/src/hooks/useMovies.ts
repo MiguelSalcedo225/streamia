@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { movieService } from '../services/movieService';
 import { favoritesService } from '../services/favoritesService';
 import type { Movie, MovieFilters } from '../types/movie.types';
 
-export const useMovies = (initialFilters?: MovieFilters) => {
+export const useMovies = (filters?: MovieFilters) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<MovieFilters>(initialFilters || {});
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-  const loadMovies = async () => {
+
+  const loadMovies = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -28,7 +28,7 @@ export const useMovies = (initialFilters?: MovieFilters) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, favorites]); 
 
   const loadFavorites = async () => {
     try {
@@ -55,7 +55,6 @@ export const useMovies = (initialFilters?: MovieFilters) => {
         setFavorites(prev => new Set(prev).add(movieId));
       }
 
-      // Actualizar el estado local
       setMovies(prev =>
         prev.map(movie =>
           movie.id === movieId
@@ -74,7 +73,7 @@ export const useMovies = (initialFilters?: MovieFilters) => {
 
   useEffect(() => {
     loadMovies();
-  }, [filters]);
+  }, [loadMovies]); 
 
   // Escuchar eventos de favoritos externos
   useEffect(() => {
@@ -99,8 +98,6 @@ export const useMovies = (initialFilters?: MovieFilters) => {
     movies,
     loading,
     error,
-    filters,
-    setFilters,
     toggleFavorite,
     refetch: loadMovies,
   };

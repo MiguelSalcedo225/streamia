@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Movie } from '../types/movie.types';
+import '../styles/MovieCard.scss';
 
 interface MovieCardProps {
   movie: Movie;
@@ -29,52 +30,59 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   };
 
   return (
-    <div
-      className="movie-card group relative rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105 cursor-pointer"
-      onClick={handleCardClick}
-    >
+    <div className="movie-card" onClick={handleCardClick}>
+      {/* Imagen */}
       <img
         src={movie.posterUrl}
         alt={movie.title}
-        className="w-full h-80 object-cover"
+        loading="lazy"
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x450?text=No+Image';
+        }}
       />
       
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <h3 className="text-white font-bold text-lg mb-2">{movie.title}</h3>
-          <p className="text-gray-200 text-sm line-clamp-2">{movie.description}</p>
-          
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400">★</span>
-              <span className="text-white text-sm">{movie.rating.toFixed(1)}</span>
-            </div>
-            <span className="text-gray-300 text-xs">{movie.duration} min</span>
+      {/* Overlay en hover */}
+      <div className="movie-card__overlay" />
+
+      {/* Contenido al hacer hover */}
+      <div className="movie-card__content">
+        <h3 className="movie-card__title">{movie.title}</h3>
+        <p className="movie-card__description">{movie.description}</p>
+        
+        <div className="movie-card__meta">
+          <div className="movie-card__rating">
+            <span className="movie-card__rating-star">★</span>
+            <span className="movie-card__rating-value">{movie.rating.toFixed(1)}</span>
           </div>
+          <span className="movie-card__duration">{movie.duration} min</span>
         </div>
+
+        {/* Géneros */}
+        {movie.genres && movie.genres.length > 0 && (
+          <div className="movie-card__genres">
+            {movie.genres.slice(0, 2).map((genre) => (
+              <span key={genre} className="movie-card__genre">
+                {genre}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Botón de favorito */}
       {onFavoriteToggle && (
         <button
           onClick={handleFavoriteClick}
-          className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm p-2 rounded-full hover:bg-black/70 transition-colors z-10"
+          className={`movie-card__favorite ${
+            movie.isFavorite ? 'movie-card__favorite--active' : 'movie-card__favorite--inactive'
+          }`}
           aria-label={movie.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
         >
-          <svg
-            className={`w-5 h-5 ${movie.isFavorite ? 'fill-red-500' : 'fill-none stroke-white'}`}
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-          >
-            <path
-              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-            />
+          <svg viewBox="0 0 24 24">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
         </button>
       )}
-
-      <div className="absolute top-2 left-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded">
-        {movie.category}
-      </div>
     </div>
   );
 };

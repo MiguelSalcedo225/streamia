@@ -12,13 +12,16 @@ import '../styles/MoviesListPage.scss';
 const logger = createLogger('MoviesListPage');
 
 export const MoviesListPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Obtener filtros iniciales de la URL
   const initialCategory = searchParams.get('category') || undefined;
   const initialSearch = searchParams.get('search') || undefined;
+  const initialGenre = searchParams.get('genre') || undefined;
+  const initialRating = searchParams.get('rating') ? Number(searchParams.get('rating')) : undefined;
 
   const {
     filters,
@@ -30,6 +33,8 @@ export const MoviesListPage: React.FC = () => {
   } = useFilters({
     category: initialCategory,
     search: initialSearch,
+    genre: initialGenre,
+    rating: initialRating,
   });
 
   const {
@@ -48,71 +53,62 @@ export const MoviesListPage: React.FC = () => {
     setupEventListeners();
 
     return () => {
-      // Cleanup event listeners
       window.removeEventListener('user:authenticated', handleUserAuthenticated);
       window.removeEventListener('favorite:removed', handleFavoriteRemoved);
     };
   }, []);
 
   useEffect(() => {
-    // Sincronizar filtros con URL
     const params = new URLSearchParams();
+    
     if (filters.category) params.set('category', filters.category);
     if (filters.search) params.set('search', filters.search);
     if (filters.genre) params.set('genre', filters.genre);
     if (filters.rating) params.set('rating', filters.rating.toString());
 
+    // Solo actualizar si hay cambios
     const newSearch = params.toString();
-    if (newSearch !== searchParams.toString()) {
+    const currentSearch = searchParams.toString();
+    
+    if (newSearch !== currentSearch) {
       navigate(`/movies?${newSearch}`, { replace: true });
-      logger.info('Filters updated', { filters });
+      logger.info('Filters updated and URL synced', { filters });
     }
-  }, [filters]);
+  }, [filters, navigate, searchParams]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchQuery || undefined);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, setSearch]);
 
   const setupEventListeners = () => {
-    // Escuchar cuando el usuario se autentica
     window.addEventListener('user:authenticated', handleUserAuthenticated as EventListener);
-    
-    // Escuchar cuando se elimina un favorito desde otro MFE
     window.addEventListener('favorite:removed', handleFavoriteRemoved as EventListener);
-
     logger.info('Event listeners configured');
   };
 
   const handleUserAuthenticated = (event: CustomEvent) => {
     const { userId, user } = event.detail;
     logger.info('User authenticated event received', { userId });
-    
-    // Recargar la lista de películas con favoritos actualizados
-    window.location.reload(); // O implementar una forma más elegante de recargar
+    window.location.reload();
   };
 
   const handleFavoriteRemoved = (event: CustomEvent) => {
     const { movieId } = event.detail;
     logger.info('Favorite removed event received from external source', { movieId });
-    
-    // El hook useMovies ya maneja esto, pero podemos agregar lógica adicional aquí
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
-    // Debounce la búsqueda
-    const timer = setTimeout(() => {
-      setSearch(query || undefined);
-      if (query) {
-        logger.info('Search query updated', { query });
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
   };
 
   const handleMovieClick = (movie: any) => {
     logger.info('Movie clicked', { movieId: movie.id, title: movie.title });
     
-    // Emitir evento movie:selected
     window.dispatchEvent(
       new CustomEvent('movie:selected', {
         detail: { movieId: movie.id, movie },
@@ -120,6 +116,11 @@ export const MoviesListPage: React.FC = () => {
     );
     
     navigate(`/movie/${movie.id}`);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setSearch(undefined);
   };
 
   return (
@@ -135,6 +136,14 @@ export const MoviesListPage: React.FC = () => {
             onChange={handleSearch}
             className="movies-list__search-input"
           />
+          {searchQuery && (
+            <button 
+              className="movies-list__clear-search"
+              onClick={handleClearSearch}
+            >
+              ×
+            </button>
+          )}
         </div>
         
         <button
@@ -152,19 +161,27 @@ export const MoviesListPage: React.FC = () => {
           <h2>
             Resultados de búsqueda: "{filters.search}"
             <span className="movies-list__results-count">
-              ({movies.length} películas)
+              ({movies.length} película{movies.length !== 1 ? 's' : ''})
             </span>
           </h2>
+          <button 
+            className="movies-list__clear-search-btn"
+            onClick={handleClearSearch}
+          >
+            Limpiar búsqueda
+          </button>
         </div>
       )}
 
       {/* Category Selector */}
-      <div className="movies-list__categories">
-        <CategorySelector
-          selectedCategory={filters.category}
-          onCategoryChange={setCategory}
-        />
-      </div>
+      {!filters.search && (
+        <div className="movies-list__categories">
+          <CategorySelector
+            selectedCategory={filters.category}
+            onCategoryChange={setCategory}
+          />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="movies-list__content">
@@ -197,8 +214,10 @@ export const MoviesListPage: React.FC = () => {
                 'Cargando...'
               ) : (
                 <>
-                  {movies.length} película{movies.length !== 1 ? 's' : ''}{' '}
-                  encontrada{movies.length !== 1 ? 's' : ''}
+                  {movies.length} película{movies.length !== 1 ? 's' : ''} encontrada{movies.length !== 1 ? 's' : ''}
+                  {filters.category && ` en ${filters.category}`}
+                  {filters.genre && ` - Género: ${filters.genre}`}
+                  {filters.rating && ` - Rating: ${filters.rating}+`}
                 </>
               )}
             </p>
@@ -207,35 +226,42 @@ export const MoviesListPage: React.FC = () => {
           {/* Error State */}
           {error && (
             <div className="movies-list__error">
-              <p>{error}</p>
+              <p>Error: {error}</p>
+              <button onClick={() => window.location.reload()} className="btn btn--primary">
+                Reintentar
+              </button>
             </div>
           )}
 
           {/* Empty State */}
-          {!loading && movies.length === 0 && filters.search && (
+          {!loading && movies.length === 0 && (
             <div className="movies-list__no-results">
               <Search size={64} />
               <h3>No se encontraron películas</h3>
-              <p>No hay resultados para "{filters.search}"</p>
+              <p>
+                {filters.search 
+                  ? `No hay resultados para "${filters.search}"`
+                  : 'Prueba ajustando los filtros o busca algo diferente'
+                }
+              </p>
               <button
                 className="btn btn--primary"
-                onClick={() => {
-                  setSearchQuery('');
-                  clearFilters();
-                }}
+                onClick={clearFilters}
               >
-                Limpiar búsqueda
+                Limpiar todos los filtros
               </button>
             </div>
           )}
 
           {/* Movies Grid */}
-          <MovieGrid
-            movies={movies}
-            loading={loading}
-            onFavoriteToggle={toggleFavorite}
-            onMovieClick={handleMovieClick}
-          />
+          {!loading && movies.length > 0 && (
+            <MovieGrid
+              movies={movies}
+              loading={loading}
+              onFavoriteToggle={toggleFavorite}
+              onMovieClick={handleMovieClick}
+            />
+          )}
         </main>
       </div>
 

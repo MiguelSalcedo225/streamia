@@ -6,7 +6,7 @@ export interface Movie {
   backdropUrl?: string;
   releaseDate: string;
   rating: number;
-  duration: number; // en minutos
+  duration: number; 
   category: string;
   genres: string[];
   isFavorite?: boolean;

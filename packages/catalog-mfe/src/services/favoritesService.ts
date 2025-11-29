@@ -1,53 +1,287 @@
+import { createLogger } from '@streamia/shared/utils';
 import type { FavoritePayload } from '../types/movie.types';
 
+const logger = createLogger('FavoritesService');
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+//Prueba
+const USE_MOCK_DATA = true;
+//const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || false;
 
 class FavoritesService {
+  private mockFavorites = new Set<string>();
+  private readonly MOCK_STORAGE_KEY = 'streamia_mock_favorites';
+
+  constructor() {
+    this.loadMockFavoritesFromStorage();
+  }
+
+  /**
+   * Cargar favoritos
+   */
+  private loadMockFavoritesFromStorage(): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stored = localStorage.getItem(this.MOCK_STORAGE_KEY);
+      if (stored) {
+        const favoritesArray = JSON.parse(stored) as string[];
+        this.mockFavorites = new Set(favoritesArray);
+        logger.info('Mock favorites loaded from storage', { 
+          count: favoritesArray.length 
+        });
+      }
+    } catch (error) {
+      logger.error('Error loading mock favorites from storage', error);
+    }
+  }
+
+  /**
+   * Guardar favoritos en localStorage
+   */
+  private saveMockFavoritesToStorage(): void {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const favoritesArray = Array.from(this.mockFavorites);
+      localStorage.setItem(this.MOCK_STORAGE_KEY, JSON.stringify(favoritesArray));
+      logger.debug('Mock favorites saved to storage', { 
+        count: favoritesArray.length 
+      });
+    } catch (error) {
+      logger.error('Error saving mock favorites to storage', error);
+    }
+  }
+
+  /**
+   * Add a movie to favorites
+   */
   async addFavorite(payload: FavoritePayload): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/favorites`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-      credentials: 'include',
-    });
+    try {
+      logger.info('Adding favorite', { movieId: payload.movieId });
 
-    if (!response.ok) {
-      throw new Error('Error al añadir favorito');
+      // Modo Mock
+      if (USE_MOCK_DATA) {
+        await new Promise(resolve => setTimeout(resolve, 300)); 
+        
+        this.mockFavorites.add(payload.movieId);
+        this.saveMockFavoritesToStorage();
+        
+        logger.info('Favorite added successfully (mock)', { 
+          movieId: payload.movieId,
+          totalFavorites: this.mockFavorites.size
+        });
+
+        this.emitFavoriteAdded(payload.movieId);
+        return;
+      }
+
+      // Modo Backend 
+      const response = await fetch(`${API_BASE_URL}/favorites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error || 'Error al añadir favorito';
+        logger.error('Failed to add favorite', { 
+          status: response.status, 
+          error: errorMessage 
+        });
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      logger.info('Favorite added successfully', { movieId: payload.movieId, result });
+
+      this.emitFavoriteAdded(payload.movieId);
+    } catch (error) {
+      logger.error('Error adding favorite', error);
+      throw error;
     }
-
-    // Emitir evento global
-    this.emitFavoriteAdded(payload.movieId);
   }
 
+  /**
+   * Remove a movie from favorites
+   */
   async removeFavorite(movieId: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/favorites/${movieId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
+    try {
+      logger.info('Removing favorite', { movieId });
 
-    if (!response.ok) {
-      throw new Error('Error al eliminar favorito');
+      // Modo Mock
+      if (USE_MOCK_DATA) {
+        await new Promise(resolve => setTimeout(resolve, 300)); 
+        
+        this.mockFavorites.delete(movieId);
+        this.saveMockFavoritesToStorage();
+        
+        logger.info('Favorite removed successfully (mock)', { 
+          movieId,
+          totalFavorites: this.mockFavorites.size
+        });
+
+        this.emitFavoriteRemoved(movieId);
+        return;
+      }
+
+      // Modo Backend 
+      const response = await fetch(`${API_BASE_URL}/favorites/${movieId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error || 'Error al eliminar favorito';
+        logger.error('Failed to remove favorite', { 
+          status: response.status, 
+          error: errorMessage 
+        });
+        throw new Error(errorMessage);
+      }
+
+      logger.info('Favorite removed successfully', { movieId });
+
+      this.emitFavoriteRemoved(movieId);
+    } catch (error) {
+      logger.error('Error removing favorite', error);
+      throw error;
     }
-
-    // Emitir evento global
-    this.emitFavoriteRemoved(movieId);
   }
 
+  /**
+   * Get all user favorites
+   * Returns array of movie IDs
+   */
   async getFavorites(): Promise<string[]> {
-    const response = await fetch(`${API_BASE_URL}/favorites`, {
-      credentials: 'include',
-    });
+    try {
+      logger.info('Fetching user favorites');
 
-    if (!response.ok) {
-      throw new Error('Error al obtener favoritos');
+      // Modo Mock
+      if (USE_MOCK_DATA) {
+        await new Promise(resolve => setTimeout(resolve, 200)); 
+        
+        const favoritesArray = Array.from(this.mockFavorites);
+        logger.info('Favorites fetched successfully (mock)', { 
+          count: favoritesArray.length 
+        });
+        return favoritesArray;
+      }
+
+      // Modo Backend 
+      const response = await fetch(`${API_BASE_URL}/favorites`, {
+        credentials: 'include',
+      });
+
+      // Si no está autenticado, devolver array vacío
+      if (response.status === 401) {
+        logger.warn('User not authenticated, returning empty favorites');
+        return [];
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error || 'Error al obtener favoritos';
+        logger.error('Failed to fetch favorites', { 
+          status: response.status, 
+          error: errorMessage 
+        });
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      
+      // Manejar diferentes formatos de respuesta del backend
+      let favoriteIds: string[] = [];
+      
+      if (Array.isArray(data)) {
+        // Si es un array directo de IDs: ["id1", "id2"]
+        favoriteIds = data.map(item => 
+          typeof item === 'string' ? item : item.movieId || item.id
+        );
+      } else if (data.favorites && Array.isArray(data.favorites)) {
+        // Si viene en { favorites: [...] }
+        favoriteIds = data.favorites.map((item: any) => 
+          typeof item === 'string' ? item : item.movieId || item.id
+        );
+      } else if (data.data && Array.isArray(data.data)) {
+        // Si viene en { data: [...] }
+        favoriteIds = data.data.map((item: any) => 
+          typeof item === 'string' ? item : item.movieId || item.id
+        );
+      }
+
+      logger.info('Favorites fetched successfully', { count: favoriteIds.length });
+      return favoriteIds.filter(id => id != null); // Filtrar nulls/undefined
+    } catch (error) {
+      logger.error('Error fetching favorites', error);
+      return [];
     }
-
-    return response.json();
   }
 
+  /**
+   * Check if a movie is in favorites
+   */
+  async isFavorite(movieId: string): Promise<boolean> {
+    try {
+      if (USE_MOCK_DATA) {
+        return this.mockFavorites.has(movieId);
+      }
+
+      // Modo Backend Real
+      const favorites = await this.getFavorites();
+      return favorites.includes(movieId);
+    } catch (error) {
+      logger.error('Error checking favorite status', error);
+      return false;
+    }
+  }
+
+  /**
+   * Toggle favorite status
+   */
+  async toggleFavorite(movieId: string, payload?: Omit<FavoritePayload, 'movieId'>): Promise<boolean> {
+    try {
+      const isFav = await this.isFavorite(movieId);
+      
+      if (isFav) {
+        await this.removeFavorite(movieId);
+        return false;
+      } else {
+        await this.addFavorite({ movieId, ...payload });
+        return true;
+      }
+    } catch (error) {
+      logger.error('Error toggling favorite', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear all mock favorites (útil para testing)
+   */
+  clearMockFavorites(): void {
+    this.mockFavorites.clear();
+    localStorage.removeItem(this.MOCK_STORAGE_KEY);
+    logger.info('Mock favorites cleared');
+  }
+
+  /**
+   * Get mock favorites count 
+   */
+  getMockFavoritesCount(): number {
+    return this.mockFavorites.size;
+  }
+
+  /**
+   * Emit favorite added event
+   */
   private emitFavoriteAdded(movieId: string): void {
+    logger.debug('Emitting favorite:added event', { movieId });
     window.dispatchEvent(
       new CustomEvent('favorite:added', {
         detail: { movieId },
@@ -55,7 +289,11 @@ class FavoritesService {
     );
   }
 
+  /**
+   * Emit favorite removed event
+   */
   private emitFavoriteRemoved(movieId: string): void {
+    logger.debug('Emitting favorite:removed event', { movieId });
     window.dispatchEvent(
       new CustomEvent('favorite:removed', {
         detail: { movieId },
@@ -63,16 +301,34 @@ class FavoritesService {
     );
   }
 
-  // Escuchar eventos externos
+  /**
+   * Listen to favorite removed events from other MFEs
+   */
   onFavoriteRemoved(callback: (movieId: string) => void): () => void {
     const handler = (event: Event) => {
       const customEvent = event as CustomEvent;
+      logger.debug('Received favorite:removed event', { movieId: customEvent.detail.movieId });
       callback(customEvent.detail.movieId);
     };
 
     window.addEventListener('favorite:removed', handler);
 
     return () => window.removeEventListener('favorite:removed', handler);
+  }
+
+  /**
+   * Listen to favorite added events from other MFEs
+   */
+  onFavoriteAdded(callback: (movieId: string) => void): () => void {
+    const handler = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      logger.debug('Received favorite:added event', { movieId: customEvent.detail.movieId });
+      callback(customEvent.detail.movieId);
+    };
+
+    window.addEventListener('favorite:added', handler);
+
+    return () => window.removeEventListener('favorite:added', handler);
   }
 }
 
