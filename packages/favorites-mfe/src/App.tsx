@@ -1,13 +1,9 @@
 
 import './App.css'
+import Favorites  from "./pages/Favorites"
 
 function App() {
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>Favorites Microfrontend</h1>
-      <p>Aquí iran las películas favoritas del usuario.</p>
-    </div>
-  );
+  return <Favorites />;
 }
 
 export default App
