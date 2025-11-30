@@ -3,9 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSharedStore } from '../store/SharedStore';
 import { Menu, User, LogOut, Film, ChevronDown } from 'lucide-react';
 import { TokenManager } from '@streamia/shared/utils';
+import { API_URL } from '@streamia/shared/config';
 import './NavBar.scss';
-
-const API_URL = 'http://localhost:8080/api';
 
 export const NavBar: React.FC = () => {
   const { user, isAuthenticated, logout } = useSharedStore();
