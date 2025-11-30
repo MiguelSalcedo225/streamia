@@ -34,9 +34,9 @@ declare module 'staticMFE/SitemapPage' {
   const SitemapPage: React.ComponentType;
   export { SitemapPage };
 }
-declare module 'commentMFE/CommentPage' {
-  const CommentPage: React.ComponentType;
-  export { CommentPage };
+declare module 'commentsMFE/App' {
+  const CommentsPage: React.ComponentType;
+  export { CommentsPage };
 }
 
 interface ImportMetaEnv {
