@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import Comments from "./App";
+// import Comments from "./App";
+import Comments from "./components/Comments";
 import "@streamia/shared/styles/index.scss";
 
 export function mount(
