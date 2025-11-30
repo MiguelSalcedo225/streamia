@@ -113,7 +113,10 @@ export const favoritesAPI = {
     });
 
     if (response.success) {
-      logger.info('Favorites fetched successfully', { count: response.data?.length });
+      logger.info('Favorites fetched successfully', { 
+        count: response.data?.length,
+        favorites: response.data // Log completo para debug
+      });
     } else {
       logger.error('Failed to fetch favorites', { error: response.error });
     }

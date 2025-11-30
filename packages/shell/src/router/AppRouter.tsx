@@ -79,7 +79,14 @@ export const AppRouter: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/favorites/*" element={<FavoritesMFE />} />
+              <Route 
+                path="/favorites/*" 
+                element={
+                  <ProtectedRoute>
+                    <FavoritesMFE />
+                  </ProtectedRoute>
+                } 
+              />
           
 
               {/* Static Pages - Static MFE */}

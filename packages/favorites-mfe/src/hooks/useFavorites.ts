@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { favoritesAPI } from '../services/favoritesService';
 import { TokenManager, eventBus, EVENTS, createLogger } from '@streamia/shared';
 import type { Movie } from '../types/favorites.types';
+import { mockMovies } from '../data/mockMovies';
 
 const logger = createLogger('useFavorites-Hook');
 
@@ -44,16 +45,31 @@ export const useFavorites = (): UseFavoritesResult => {
       const response = await favoritesAPI.getFavorites(token);
       
       if (response.success && response.data) {
-        const mappedFavorites: Movie[] = response.data.map((fav) => ({
-          id: fav.movieId,
-          title: fav.title,
-          imageUrl: fav.poster,
-          videoUrl: fav.videoUrl,
-          duration: fav.duration,
-          hasAudio: fav.hasAudio,
-          category: fav.category,
-          note: fav.note
-        }));
+        const mappedFavorites: Movie[] = response.data.map((fav) => {
+          const matched = mockMovies.find((m) => String(m.id) === String(fav.movieId));
+          // Log para debuggear las URLs de las imágenes
+          logger.info('Mapping favorite', { 
+            movieId: fav.movieId, 
+            title: fav.title,
+            poster: matched?.imageUrl ||fav.poster,
+            videoUrl: fav.videoUrl,
+            hasPoster: !!fav.poster
+          });
+          
+          // Usar poster del backend, o placeholder si no existe
+          const imageUrl = matched?.imageUrl ||fav.poster || '/images/placeholder.png';
+          
+          return {
+            id: fav.movieId,
+            title: fav.title,
+            imageUrl: imageUrl,
+            videoUrl: fav.videoUrl,
+            duration: fav.duration,
+            hasAudio: fav.hasAudio,
+            category: fav.category,
+            note: fav.note
+          };
+        });
         
         setFavorites(mappedFavorites);
         logger.info('Favorites loaded', { count: mappedFavorites.length });
@@ -99,10 +115,11 @@ export const useFavorites = (): UseFavoritesResult => {
       
       if (response.success) {
         // Update local state optimistically
+        const imageUrl = poster || '/images/placeholder.png';
         setFavorites(prev => [...prev, { 
           id: movieId, 
           title, 
-          imageUrl: poster,
+          imageUrl: imageUrl,
           note 
         }]);
         logger.info('Favorite added successfully', { movieId });

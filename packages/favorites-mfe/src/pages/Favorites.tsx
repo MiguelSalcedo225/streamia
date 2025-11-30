@@ -1,4 +1,3 @@
-import { Layout } from "../../../shell/src/components/Layout";
 import { useNavigate } from "react-router-dom";
 import MovieCard  from "../components/MovieCard";
 import { useFavorites } from "../hooks/useFavorites";
@@ -23,8 +22,7 @@ const Favorites = () => {
     };
 
   return (
-    <Layout>
-      <div className="favorites page">
+    <div className="favorites page">
       <div className="favorites__header">
         <h1 className="favorites__title">Mis Favoritos</h1>
         <p className="favorites__count">{movies.length} película{movies.length !== 1 ? 's' : ''}</p>
@@ -45,7 +43,7 @@ const Favorites = () => {
               <div className="favorites__card" key={m.id}>
                 <MovieCard 
                   id={m.id} 
-                  title={m.title} 
+                  title={m.title}
                   imageUrl={m.imageUrl} 
                   isFavorite 
                   onClick={() => handleMovieClick(m.id)}
@@ -65,7 +63,6 @@ const Favorites = () => {
         )}
       </div>
     </div>
-    </Layout>
   );
 }
 
