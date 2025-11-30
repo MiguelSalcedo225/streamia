@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { ProtectedRoute } from '../components/ProtectedRoute';
+import { GuestRoute } from '../components/GuestRoute';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { createLogger } from '@streamia/shared/utils';
@@ -29,11 +30,29 @@ const AuthMFE = loadMicrofrontend(
   'Auth MFE'
 );
 
+const CatalogMFE = loadMicrofrontend(
+  () => import('catalogMFE/App'),
+  'Catalog MFE'
+);
+
 // Load Static MFE
 const StaticMFE = loadMicrofrontend(
   () => import('staticMFE/App'),
   'Static MFE'
 );
+
+const FavoritesMFE = loadMicrofrontend(
+  () => import('favoritesMFE/App'),
+  'Favorites MFE'
+);
+
+
+// Load Comments MFE
+const CommentsMFE = loadMicrofrontend(
+  () => import('commentsMFE/App'),
+  'Comments MFE'
+);
+
 
 export const AppRouter: React.FC = () => {
   return (
@@ -42,21 +61,14 @@ export const AppRouter: React.FC = () => {
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              {/* Auth Routes - Auth MFE */}
-              <Route path="/login" element={<AuthMFE />} />
-              <Route path="/register" element={<AuthMFE />} />
-              <Route path="/recover-password" element={<AuthMFE />} />
-              <Route path="/reset-password/*" element={<AuthMFE />} />
+              {/* Auth Routes - Auth MFE (only for guests) */}
+              <Route path="/login" element={<GuestRoute><AuthMFE /></GuestRoute>} />
+              <Route path="/register" element={<GuestRoute><AuthMFE /></GuestRoute>} />
+              <Route path="/recover-password" element={<GuestRoute><AuthMFE /></GuestRoute>} />
+              <Route path="/reset-password/*" element={<GuestRoute><AuthMFE /></GuestRoute>} />
 
-              {/* Protected Routes - Placeholder for other MFEs */}
-              <Route
-                path="/movies"
-                element={
-                  <ProtectedRoute>
-                    <div>Movies MFE (To be implemented)</div>
-                  </ProtectedRoute>
-                }
-              />
+              {/* Catalog MFE Routes */}
+              <Route path="/movies/*" element={<CatalogMFE />} />
               <Route
                 path="/movie/:id"
                 element={
@@ -73,12 +85,20 @@ export const AppRouter: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/favorites"
+              <Route 
+                path="/favorites/*" 
                 element={
                   <ProtectedRoute>
-                    <div>Favorites MFE (To be implemented)</div>
+                    <FavoritesMFE />
                   </ProtectedRoute>
+                } 
+              />
+          
+
+              <Route
+                path="/movies/:id/comments"
+                element={
+                  <CommentsMFE />
                 }
               />
 
