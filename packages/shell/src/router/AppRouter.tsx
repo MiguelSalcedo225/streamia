@@ -41,6 +41,11 @@ const StaticMFE = loadMicrofrontend(
   'Static MFE'
 );
 
+const FavoritesMFE = loadMicrofrontend(
+  () => import('favoritesMFE/App'),
+  'Favorites MFE'
+);
+
 
 // Load Comments MFE
 const CommentsMFE = loadMicrofrontend(
@@ -91,14 +96,15 @@ export const AppRouter: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/favorites"
+              <Route 
+                path="/favorites/*" 
                 element={
                   <ProtectedRoute>
-                    <div>Favorites MFE (To be implemented)</div>
+                    <FavoritesMFE />
                   </ProtectedRoute>
-                }
+                } 
               />
+          
 
               <Route
                 path="/movies/:id/comments"
