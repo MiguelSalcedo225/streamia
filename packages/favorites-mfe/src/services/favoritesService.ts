@@ -1,4 +1,11 @@
 import { TokenManager, eventBus, EVENTS, createLogger } from '@streamia/shared';
+import type { 
+  FavoriteItem, 
+  AddFavoritePayload, 
+  AddFavoriteResponse,
+  UpdateFavoriteResponse,
+  RemoveFavoriteResponse 
+} from '../types/favorites.types';
 
 const API_URL =  'http://localhost:3000/api'
 const logger = createLogger('Favorites-MFE');
@@ -90,14 +97,15 @@ async function makeRequest<T>(
 export const favoritesAPI = {
   /**
    * Get all favorites for the authenticated user.
+   * Backend returns favorites with complete movie data from Cloudinary database.
    *
    * @param token - Authentication token
-   * @returns ApiResponse<any[]>
+   * @returns ApiResponse<FavoriteItem[]>
    */
-  async getFavorites(token: string): Promise<ApiResponse<any[]>> {
+  async getFavorites(token: string): Promise<ApiResponse<FavoriteItem[]>> {
     logger.info('Fetching user favorites');
     
-    const response = await makeRequest<any[]>('/favorites', {
+    const response = await makeRequest<FavoriteItem[]>('/favorites', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -115,18 +123,19 @@ export const favoritesAPI = {
 
   /**
    * Add a movie to favorites.
+   * Backend validates required fields and prevents duplicates (409 if already exists).
    *
    * @param token - Authentication token
    * @param payload - Movie data: { movieId, title, poster, note? }
-   * @returns ApiResponse
+   * @returns ApiResponse<AddFavoriteResponse>
    */
   async addFavorite(
     token: string,
-    payload: { movieId: string; title: string; poster: string; note?: string }
-  ): Promise<ApiResponse> {
+    payload: AddFavoritePayload
+  ): Promise<ApiResponse<AddFavoriteResponse>> {
     logger.info('Adding movie to favorites', { movieId: payload.movieId });
     
-    const response = await makeRequest('/favorites', {
+    const response = await makeRequest<AddFavoriteResponse>('/favorites', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -155,20 +164,21 @@ export const favoritesAPI = {
 
   /**
    * Update a note in a favorite movie.
+   * Backend verifies ownership before updating.
    *
    * @param token - Authentication token
-   * @param id - Favorite document ID
+   * @param id - Favorite document ID (_id from MongoDB)
    * @param note - New note content
-   * @returns ApiResponse
+   * @returns ApiResponse<UpdateFavoriteResponse>
    */
   async updateFavoriteNote(
     token: string,
     id: string,
     note: string
-  ): Promise<ApiResponse> {
+  ): Promise<ApiResponse<UpdateFavoriteResponse>> {
     logger.info('Updating favorite note', { id });
     
-    const response = await makeRequest(`/favorites/${id}`, {
+    const response = await makeRequest<UpdateFavoriteResponse>(`/favorites/${id}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -187,18 +197,19 @@ export const favoritesAPI = {
 
   /**
    * Remove a movie from favorites.
+   * Backend verifies ownership and returns 404 if not found.
    *
    * @param token - Authentication token
    * @param movieId - Movie ID to remove
-   * @returns ApiResponse
+   * @returns ApiResponse<RemoveFavoriteResponse>
    */
   async removeFavorite(
     token: string,
     movieId: string
-  ): Promise<ApiResponse> {
+  ): Promise<ApiResponse<RemoveFavoriteResponse>> {
     logger.info('Removing movie from favorites', { movieId });
     
-    const response = await makeRequest(`/favorites/${movieId}`, {
+    const response = await makeRequest<RemoveFavoriteResponse>(`/favorites/${movieId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,

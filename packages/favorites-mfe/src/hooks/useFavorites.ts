@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { favoritesAPI } from '../services/favoritesService';
 import { TokenManager, eventBus, EVENTS, createLogger } from '@streamia/shared';
+import type { Movie } from '../types/favorites.types';
 
 const logger = createLogger('useFavorites-Hook');
 
 interface UseFavoritesResult {
-  favorites: Array<{ id: string; title: string; imageUrl: string }>;
+  favorites: Movie[];
   loading: boolean;
   error: string | null;
   addFavorite: (movieId: string, title: string, poster: string, note?: string) => Promise<boolean>;
@@ -19,12 +20,13 @@ interface UseFavoritesResult {
  * Handles API calls, state management, and EventBus communication
  */
 export const useFavorites = (): UseFavoritesResult => {
-  const [favorites, setFavorites] = useState<Array<{ id: string; title: string; imageUrl: string }>>([]);
+  const [favorites, setFavorites] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
    * Load favorites from API
+   * Backend returns complete movie data from Cloudinary database
    */
   const loadFavorites = useCallback(async () => {
     const token = TokenManager.getToken();
@@ -42,10 +44,15 @@ export const useFavorites = (): UseFavoritesResult => {
       const response = await favoritesAPI.getFavorites(token);
       
       if (response.success && response.data) {
-        const mappedFavorites = response.data.map((fav: any) => ({
-          id: fav.movieId || fav.id,
+        const mappedFavorites: Movie[] = response.data.map((fav) => ({
+          id: fav.movieId,
           title: fav.title,
-          imageUrl: fav.poster || fav.imageUrl
+          imageUrl: fav.poster,
+          videoUrl: fav.videoUrl,
+          duration: fav.duration,
+          hasAudio: fav.hasAudio,
+          category: fav.category,
+          note: fav.note
         }));
         
         setFavorites(mappedFavorites);
@@ -92,7 +99,12 @@ export const useFavorites = (): UseFavoritesResult => {
       
       if (response.success) {
         // Update local state optimistically
-        setFavorites(prev => [...prev, { id: movieId, title, imageUrl: poster }]);
+        setFavorites(prev => [...prev, { 
+          id: movieId, 
+          title, 
+          imageUrl: poster,
+          note 
+        }]);
         logger.info('Favorite added successfully', { movieId });
         return true;
       } else {
