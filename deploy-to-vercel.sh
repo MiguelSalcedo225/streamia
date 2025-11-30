@@ -33,7 +33,7 @@ NC='\033[0m' # No Color
 # Configuración
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEPLOY_DIR="/tmp/streamia-vercel-deploy"
-BACKEND_URL="https://streamia-server.onrender.com/api"
+BACKEND_URL="https://stremiaserver.onrender.com/api"
 
 # Nombres de los proyectos en Vercelauth-mfe
 declare -A MFE_PROJECTS=(
