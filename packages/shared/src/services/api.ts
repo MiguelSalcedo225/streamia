@@ -700,7 +700,7 @@ export const apiUtils = {
    * @returns token string or null when not present
    */
   getToken(): string | null {
-    return localStorage.getItem('streamia_token');
+    return localStorage.getItem('authToken');
   },
 
   /**
@@ -708,14 +708,14 @@ export const apiUtils = {
    * @param token - Token string to save
    */
   saveToken(token: string): void {
-    localStorage.setItem('streamia_token', token);
+    localStorage.setItem('authToken', token);
   },
 
   /**
    * Remove the authentication token from localStorage.
    */
   removeToken(): void {
-    localStorage.removeItem('streamia_token');
+    localStorage.removeItem('authToken');
   },
 
   /**

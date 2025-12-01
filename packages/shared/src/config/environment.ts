@@ -31,7 +31,7 @@ export const config = {
     },
   },
 
-  TOKEN_KEY: "streamia_token",
+  TOKEN_KEY: "authToken",
   APP_NAME: "STREAMIA",
   APP_VERSION: "1.0.0",
   DEBUG: true,
